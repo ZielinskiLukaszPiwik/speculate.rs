@@ -19,9 +19,14 @@ speculate! {
             let two = ONE + ONE;
         }
 
+        data_provider {
+            let three = ONE + ONE + ONE;
+        }
+
         it "can add stuff" {
             assert_eq!(ONE, add(ZERO, ONE));
             assert_eq!(two, add(ONE, ONE));
+            assert_eq!(three, add(two, ONE));
         }
 
         it "can subtract stuff" {

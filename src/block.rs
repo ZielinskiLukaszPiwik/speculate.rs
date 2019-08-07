@@ -10,6 +10,7 @@ impl Synom for Root {
 
         ({
             let mut before = vec![];
+            let mut data_provider = vec![];
             let mut after  = vec![];
             let mut blocks = vec![];
 
@@ -17,13 +18,14 @@ impl Synom for Root {
                 match block {
                     DescribeBlock::Regular(block) => blocks.push(block),
                     DescribeBlock::Before(block)  => before.push(block),
+                    DescribeBlock::DataProvider(block)  => before.push(block),
                     DescribeBlock::After(block)   => after.push(block)
                 }
             }
 
             Root(Describe {
                 name: syn::Ident::new("speculate", Span::call_site()),
-                before, after, blocks
+                before, data_provider, after, blocks
             })
         })
     ));
@@ -52,6 +54,7 @@ impl Synom for Block {
 enum DescribeBlock {
     Regular(Block),
     Before(syn::Block),
+    DataProvider(syn::Block),
     After(syn::Block),
 }
 
@@ -62,6 +65,11 @@ impl Synom for DescribeBlock {
             block: syn!(syn::Block)             >>
             (DescribeBlock::Before(block))      )
         |
+        do_parse!(
+            custom_keyword!(data_provider)             >>
+            block: syn!(syn::Block)             >>
+            (DescribeBlock::DataProvider(block))      )
+        |        
         do_parse!(
             custom_keyword!(after)              >>
             block: syn!(syn::Block)             >>
@@ -75,6 +83,7 @@ impl Synom for DescribeBlock {
 pub struct Describe {
     pub name: syn::Ident,
     pub before: Vec<syn::Block>,
+    pub data_provider: Vec<syn::Block>,
     pub after: Vec<syn::Block>,
     pub blocks: Vec<Block>,
 }
